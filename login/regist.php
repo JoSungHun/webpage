@@ -6,15 +6,29 @@
 
     <?php
     include("../db_connect.php");
+    include("../sqli_shield.php");
 	$connect = db_connect();
     
     $regist_id = $_POST['id'];
 	$regist_pw = $_POST['pw'];
 
+
+    # 널, 특수문자 체크
     if($regist_id&&$regist_pw == NULL){
         echo "<script>alert('값을 입력해 주세요.');history.back();</script>";
         exit;
     }
+    if(sqli_preg($regist_id)== false){
+        echo "<script>alert('ERROR');history.back();</script>";
+        exit;
+    }
+    if(sqli_preg($regist_pw)== false){
+        echo "<script>alert('ERROR');history.back();</script>";
+        exit;
+    }
+
+    $regist_id = mysqli_real_escape_string($connect, $regist_id);
+    $regist_pw = mysqli_real_escape_string($connect, $regist_pw);
 
     $overlap_check_query = "SELECT * FROM user WHERE id = '$regist_id'";
 	$regist_query = "INSERT INTO user VALUES ('$regist_id', '$regist_pw')";
@@ -42,7 +56,6 @@
     }else{
         echo "<script>alert('ERROR');history.back();</script>";
     }
-	
 	mysqli_close($connect);
     ?>
     
